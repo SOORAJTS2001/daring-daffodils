@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swipe Detection</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden; /* prevent whole page scroll */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #touchArea {
+            border-radius: 10px;
+            width: 300px;
+            height: 50vh;
+            overflow-y: auto;
+            padding: 10px;
+            box-sizing: border-box;
+            background: linear-gradient(#ffcccc, #ccffcc);
+            touch-action: none; /* prevent default gestures like pull-to-refresh */
+
+            /* Hide scrollbar for WebKit browsers */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+
+        /* Fake content to make it scrollable */
+        .content {
+            height: 50vh;
+        }
+    </style>
+</head>
+<body>
+
+<div id="touchArea">
+    <div class="content">
+    </div>
+</div>
+
+<script>
+    const FIREBASE_DB_URL = "<PROJECT_URL>";
+
+    function sendCoords(x, y, click, fingers) {
+        fetch(FIREBASE_DB_URL, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({x, y, click, fingers, browser_width, browser_height})
+        });
+    }
+
+    let startX = 0, startY = 0;
+    let endX = 0, endY = 0;
+    let browser_height = window.innerHeight;
+    let browser_width = window.innerWidth;
+    let fingers = 1
+
+    const touchArea = document.getElementById("touchArea");
+
+    touchArea.addEventListener("touchstart", function (e) {
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+    }, {passive: true});
+
+    touchArea.addEventListener("touchmove", e => {
+        e.preventDefault();
+        fingers = e.touches.length
+    });
+
+    touchArea.addEventListener("touchend", function (e) {
+        const touch = e.changedTouches[0];
+        endX = touch.clientX;
+        endY = touch.clientY;
+
+        let deltaX = endX - startX;
+        let deltaY = endY - startY;
+
+        // Scale according to your fixed resolution
+        deltaX = deltaX * (1719 / browser_width);
+        deltaY = deltaY * (865 / browser_height);
+
+        console.log(`X change ${deltaX} and Y change ${deltaY}`);
+
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            console.log(deltaX > 0 ? "Swipe Right" : "Swipe Left");
+        } else {
+            console.log(deltaY > 0 ? "Swipe Down" : "Swipe Up");
+        }
+
+        if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) {
+            console.log("Click detected");
+            sendCoords(0, 0, true, fingers);
+        } else {
+            console.log("No click");
+            sendCoords(deltaX, deltaY, false, fingers);
+        }
+    }, {passive: true});
+</script>
+
+</body>
+</html>
