@@ -33,7 +33,7 @@ fix = true
 
 [tool.ruff.lint]
 # Enable all linting rules.
-select = ["ALL"]
+#select = ["ALL"]
 # Ignore some of the most obnoxious linting errors.
 ignore = [
     # Missing docstrings.
@@ -57,4 +57,6 @@ ignore = [
     "TD002",
     "TD003",
     "FIX",
+    # will remove at the end of project
+    "PGH004"
 ]

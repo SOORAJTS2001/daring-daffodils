@@ -1,105 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swipe Detection</title>
+    <title>Touch, Drag, Scroll Detection</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- PyScript CSS -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.2.1/core.css">
+
+    <!-- PyScript JS -->
+    <script type="module" src="https://pyscript.net/releases/2024.2.1/core.js"></script>
+
     <style>
         body {
             margin: 0;
             height: 100vh;
-            overflow: hidden; /* prevent whole page scroll */
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            background: #f8f9fa;
         }
 
         #touchArea {
             border-radius: 10px;
-            width: 300px;
             height: 50vh;
             overflow-y: auto;
             padding: 10px;
             box-sizing: border-box;
             background: linear-gradient(#ffcccc, #ccffcc);
-            touch-action: none; /* prevent default gestures like pull-to-refresh */
-
-            /* Hide scrollbar for WebKit browsers */
+            touch-action: none;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE/Edge */
         }
 
-        /* Fake content to make it scrollable */
+        #touchArea::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
         .content {
-            height: 50vh;
+            height: 50vh; /* fake content */
         }
     </style>
 </head>
 <body>
 
-<div id="touchArea">
-    <div class="content">
+<div class="container text-center">
+    <h1 class="mb-4">Touch, Drag, Scroll Detection</h1>
+
+    <!-- Touch Area -->
+    <div id="touchArea" class="mb-4 shadow-sm border">
+        <div class="content"></div>
+    </div>
+
+    <!-- Textarea to paste copied text -->
+    <div class="mb-3">
+        <label for="copiedText" class="form-label fw-bold">Copied Text</label>
+        <textarea id="copiedText" class="form-control" rows="5" placeholder="Your copied text will appear here..." readonly></textarea>
     </div>
 </div>
 
-<script>
-    const FIREBASE_DB_URL = "<PROJECT_URL>";
+<!-- PyScript -->
+<py-script src="main.py"></py-script>
 
-    function sendCoords(x, y, click, fingers) {
-        fetch(FIREBASE_DB_URL, {
-            method: "PUT",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({x, y, click, fingers, browser_width, browser_height})
-        });
-    }
-
-    let startX = 0, startY = 0;
-    let endX = 0, endY = 0;
-    let browser_height = window.innerHeight;
-    let browser_width = window.innerWidth;
-    let fingers = 1
-
-    const touchArea = document.getElementById("touchArea");
-
-    touchArea.addEventListener("touchstart", function (e) {
-        const touch = e.touches[0];
-        startX = touch.clientX;
-        startY = touch.clientY;
-    }, {passive: true});
-
-    touchArea.addEventListener("touchmove", e => {
-        e.preventDefault();
-        fingers = e.touches.length
-    });
-
-    touchArea.addEventListener("touchend", function (e) {
-        const touch = e.changedTouches[0];
-        endX = touch.clientX;
-        endY = touch.clientY;
-
-        let deltaX = endX - startX;
-        let deltaY = endY - startY;
-
-        // Scale according to your fixed resolution
-        deltaX = deltaX * (1719 / browser_width);
-        deltaY = deltaY * (865 / browser_height);
-
-        console.log(`X change ${deltaX} and Y change ${deltaY}`);
-
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            console.log(deltaX > 0 ? "Swipe Right" : "Swipe Left");
-        } else {
-            console.log(deltaY > 0 ? "Swipe Down" : "Swipe Up");
-        }
-
-        if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) {
-            console.log("Click detected");
-            sendCoords(0, 0, true, fingers);
-        } else {
-            console.log("No click");
-            sendCoords(deltaX, deltaY, false, fingers);
-        }
-    }, {passive: true});
-</script>
+<!-- Bootstrap JS (optional for components) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
