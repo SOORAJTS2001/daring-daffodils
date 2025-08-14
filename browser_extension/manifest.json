@@ -2,9 +2,19 @@
     "manifest_version": 3,
     "name": "Firebase Mouse Controller",
     "version": "1.0",
-    "permissions": ["activeTab", "scripting"],
+    "permissions": [],
+    "host_permissions": ["<all_urls>"],
     "background": {
         "service_worker": "background.js"
     },
-    "action": { "default_title": "Start Mouse Control" }
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["firebase_app.js"],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_title": "Firebase Mouse Controller"
+    }
 }
