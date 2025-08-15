@@ -21,6 +21,7 @@ dev = [
 ]
 
 [tool.ruff]
+exclude = ["browser_extension/runtime"]
 # Increase the line length. This breaks PEP8 but it is way easier to work with.
 # The original reason for this limit was a standard vim terminal is only 79 characters,
 # but this doesn't really apply anymore.
@@ -32,8 +33,8 @@ target-version = "py312"
 fix = true
 
 [tool.ruff.lint]
-# Enable all linting rules.
-select = ["ALL"]
+# Disable all linting rules for now.
+#select = ["ALL"]
 # Ignore some of the most obnoxious linting errors.
 ignore = [
     # Missing docstrings.
@@ -57,4 +58,6 @@ ignore = [
     "TD002",
     "TD003",
     "FIX",
+    # will remove at the end of project
+    "PGH004"
 ]

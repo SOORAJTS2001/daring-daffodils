@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "PyScript Auto Injector",
+  "version": "1.0",
+  "description": "Automatically inject PyScript headers and main.py on every page.",
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["main.py","runtime/pyscript.js","runtime/pyscript.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
