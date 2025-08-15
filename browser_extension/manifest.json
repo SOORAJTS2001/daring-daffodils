@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "WebSocket Mouse Controller",
+    "version": "1.0",
+    "permissions": [
+        "activeTab"
+    ],
+    "host_permissions": [
+        "<all_urls>",
+        "http://localhost:*/*",
+        "ws://localhost:*/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["websocket_app.js"],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_title": "WebSocket Mouse Controller"
+    }
+}
