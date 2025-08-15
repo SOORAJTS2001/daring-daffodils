@@ -1,20 +1,26 @@
 {
     "manifest_version": 3,
-    "name": "Firebase Mouse Controller",
+    "name": "WebSocket Mouse Controller",
     "version": "1.0",
-    "permissions": [],
-    "host_permissions": ["<all_urls>"],
+    "permissions": [
+        "activeTab"
+    ],
+    "host_permissions": [
+        "<all_urls>",
+        "http://localhost:*/*",
+        "ws://localhost:*/*"
+    ],
     "background": {
         "service_worker": "background.js"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["firebase_app.js"],
+            "js": ["websocket_app.js"],
             "run_at": "document_idle"
         }
     ],
     "action": {
-        "default_title": "Firebase Mouse Controller"
+        "default_title": "WebSocket Mouse Controller"
     }
 }

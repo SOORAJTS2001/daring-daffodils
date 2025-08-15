@@ -1,0 +1,6 @@
+@echo off
+echo Installing WebSocket dependencies...
+pip install -r requirements.txt
+
+echo Starting WebSocket server...
+python websocket_server.py

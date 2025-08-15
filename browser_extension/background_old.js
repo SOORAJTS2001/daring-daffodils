@@ -1,26 +1,24 @@
+
 // Background script for WebSocket Mouse Controller
-// Uses HTTP polling for better service worker compatibility
+// Handles WebSocket connections since content scripts have limitations
 
 const WEBSOCKET_URL = "ws://localhost:8765";
 const HTTP_POLLING_URL = "http://localhost:8766/data";
 
 let websocket = null;
-let isWebSocketEnabled = false; // Start with HTTP polling
+let isWebSocketEnabled = true;
 let pollingInterval = null;
 
 chrome.runtime.onInstalled.addListener(() => {
-    console.log("Background: WebSocket Mouse Controller installed and ready.");
+    console.log("WebSocket Mouse Controller installed and ready.");
+    // Start with HTTP polling for better compatibility with service workers
     console.log("Background: Starting with HTTP polling (service worker compatibility)");
-    startHttpPolling();
-});
-
-chrome.runtime.onStartup.addListener(() => {
-    console.log("Background: Extension startup, starting HTTP polling");
     startHttpPolling();
 });
 
 function initWebSocket() {
     // Note: Service workers may have limitations with WebSocket connections
+    // This is kept for manual testing but HTTP polling is preferred
     if (!isWebSocketEnabled) return;
     
     try {
@@ -28,6 +26,7 @@ function initWebSocket() {
         
         websocket.onopen = function(event) {
             console.log("Background: WebSocket connected to mobile app");
+            // Stop HTTP polling if WebSocket works
             if (pollingInterval) {
                 clearInterval(pollingInterval);
                 pollingInterval = null;
@@ -38,7 +37,45 @@ function initWebSocket() {
             try {
                 const data = JSON.parse(event.data);
                 console.log("Background: Received data via WebSocket:", data);
-                sendDataToContentScripts(data);
+                
+                // Send data to all content scripts
+                chrome.tabs.query({}, (tabs) => {
+                    tabs.forEach(tab => {
+                        chrome.tabs.sendMessage(tab.id, {
+                            type: "coordinate_data",
+                            data: data
+                        }).catch(() => {
+                            // Ignore errors for tabs that don't have content script
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error("Background: Error parsing WebSocket message:", error);
+            }
+        };
+        
+        websocket.onclose = function(event) {
+            console.log("Background: WebSocket connection closed, switching to HTTP polling...");
+            isWebSocketEnabled = false;
+            startHttpPolling();
+        };
+        
+        websocket.onerror = function(error) {
+            console.error("Background: WebSocket error (service worker limitation):", error);
+            console.log("Background: Using HTTP polling instead...");
+            isWebSocketEnabled = false;
+            startHttpPolling();
+        };
+        
+    } catch (error) {
+        console.error("Background: Failed to create WebSocket (using HTTP polling):", error);
+        isWebSocketEnabled = false;
+        startHttpPolling();
+    }
+}
+                        });
+                    });
+                });
             } catch (error) {
                 console.error("Background: Error parsing WebSocket message:", error);
             }
@@ -52,7 +89,7 @@ function initWebSocket() {
         
         websocket.onerror = function(error) {
             console.error("Background: WebSocket error:", error);
-            console.log("Background: Using HTTP polling instead...");
+            console.log("Background: Switching to HTTP polling...");
             isWebSocketEnabled = false;
             startHttpPolling();
         };
@@ -64,51 +101,36 @@ function initWebSocket() {
     }
 }
 
-function sendDataToContentScripts(data) {
-    console.log("Background: Sending data to content scripts:", data);
-    chrome.tabs.query({active: true}, (tabs) => {
-        if (tabs.length > 0) {
-            tabs.forEach(tab => {
-                chrome.tabs.sendMessage(tab.id, {
-                    type: "coordinate_data",
-                    data: data
-                }).catch((error) => {
-                    console.log("Background: Error sending to tab", tab.id, ":", error.message);
-                });
-            });
-        } else {
-            console.log("Background: No active tabs found");
-        }
-    });
-}
-
 function startHttpPolling() {
     console.log("Background: Starting HTTP polling mode");
     
     if (pollingInterval) {
         clearInterval(pollingInterval);
-        pollingInterval = null;
     }
     
     pollingInterval = setInterval(async () => {
         try {
             const response = await fetch(HTTP_POLLING_URL);
-            
             if (response.ok) {
                 const data = await response.json();
-                
                 if (data && Object.keys(data).length > 0) {
-                    console.log("Background: Received data from HTTP:", data);
-                    sendDataToContentScripts(data);
+                    // Send data to all content scripts
+                    chrome.tabs.query({}, (tabs) => {
+                        tabs.forEach(tab => {
+                            chrome.tabs.sendMessage(tab.id, {
+                                type: "coordinate_data", 
+                                data: data
+                            }).catch(() => {
+                                // Ignore errors for tabs that don't have content script
+                            });
+                        });
+                    });
                 }
-                // Don't log empty responses to avoid spam
-            } else {
-                console.error("Background: HTTP response not OK:", response.status);
             }
         } catch (error) {
             console.error("Background: HTTP polling error:", error);
         }
-    }, 100); // Back to fast polling
+    }, 50);
 }
 
 // Listen for messages from content scripts
@@ -135,12 +157,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         
         sendResponse({status: "toggled", mode: isWebSocketEnabled ? "websocket" : "http"});
-    } else if (message.type === "get_status") {
-        sendResponse({
-            mode: isWebSocketEnabled ? "websocket" : "http",
-            polling: pollingInterval !== null,
-            websocket_connected: websocket && websocket.readyState === WebSocket.OPEN
-        });
     }
     
     return true; // Keep message channel open for async response

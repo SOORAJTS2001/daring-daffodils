@@ -4,11 +4,15 @@ import asyncio
 import json
 from typing import Any
 
-from js import clearTimeout, console, document, setInterval, setTimeout, window
+from js import clearTimeout, console, document, setInterval, setTimeout, window, WebSocket
 from pyodide.ffi import create_proxy
 from pyodide.http import pyfetch
 
-FIREBASE_DB_URL = "<DATABASE_URL>"
+FIREBASE_DB_URL = "https://fake-mouse-706a0-default-rtdb.firebaseio.com/coordinates.json"
+WEBSOCKET_URL = "ws://localhost:8765"
+
+# WebSocket connection
+websocket_connection = None
 
 START_X = 0
 START_Y = 0
@@ -23,6 +27,60 @@ LONG_PRESS_TIME = 300  # ms
 MOVE_THRESHOLD = 5  # px
 
 console.log("Loaded main.py!")
+
+
+def init_websocket():
+    """Initialize WebSocket connection"""
+    global websocket_connection
+    try:
+        websocket_connection = WebSocket.new(WEBSOCKET_URL)
+        
+        def on_open(event):
+            console.log("WebSocket connected successfully")
+        
+        def on_error(event):
+            console.log("WebSocket error:", event)
+        
+        def on_close(event):
+            console.log("WebSocket connection closed")
+            # Try to reconnect after 3 seconds
+            setTimeout(create_proxy(init_websocket), 3000)
+        
+        websocket_connection.onopen = create_proxy(on_open)
+        websocket_connection.onerror = create_proxy(on_error)
+        websocket_connection.onclose = create_proxy(on_close)
+        
+    except Exception as e:
+        console.log(f"Failed to create WebSocket: {e}")
+        # Retry after 3 seconds
+        setTimeout(create_proxy(init_websocket), 3000)
+
+
+def send_via_websocket(data):
+    """Send data via WebSocket if connected"""
+    global websocket_connection
+    try:
+        # Validate data before sending
+        if not data or not isinstance(data, dict):
+            console.log("WebSocket: Ignoring empty or invalid data")
+            return False
+            
+        # Only send coordinate data with required fields
+        required_fields = ['x', 'y', 'type']
+        if not all(field in data for field in required_fields):
+            console.log(f"WebSocket: Ignoring data without required fields: {data}")
+            return False
+        
+        if websocket_connection and websocket_connection.readyState == 1:  # OPEN
+            websocket_connection.send(json.dumps(data))
+            console.log("Data sent via WebSocket:", data)
+            return True
+        else:
+            console.log("WebSocket not ready, falling back to Firebase")
+            return False
+    except Exception as e:
+        console.log(f"WebSocket send error: {e}")
+        return False
 
 
 async def get_text() -> None:
@@ -54,12 +112,18 @@ async def send_coords(x: float, y: float, click: bool, fingers: int, type_: str)
         "browser_height": BROWSER_HEIGHT,
         "type": type_,
     }
-    await pyfetch(
-        url=FIREBASE_DB_URL,
-        method="PATCH",
-        headers={"Content-Type": "application/json"},
-        body=json.dumps(payload),
-    )
+    
+    # Try WebSocket first, fallback to Firebase
+    websocket_sent = send_via_websocket(payload)
+    
+    if not websocket_sent:
+        # Fallback to Firebase
+        await pyfetch(
+            url=FIREBASE_DB_URL,
+            method="PATCH",
+            headers={"Content-Type": "application/json"},
+            body=json.dumps(payload),
+        )
 
 
 async def touch_start(event: Any) -> None:
@@ -145,6 +209,10 @@ def start_interval() -> None:
 
 
 start_interval()
+
+# Initialize WebSocket connection
+init_websocket()
+
 touch_area = document.getElementById("touchArea")
 touch_area.addEventListener("touchstart", create_proxy(touch_start), {"passive": True})
 touch_area.addEventListener("touchmove", create_proxy(touch_move), {"passive": True})

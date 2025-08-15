@@ -1,4 +1,4 @@
-const FIREBASE_DB_URL = "<PROJECT_FIREBASE_URL>";
+const FIREBASE_DB_URL = "https://fake-mouse-706a0-default-rtdb.firebaseio.com/coordinates.json";
 
 function createFakeCursor() {
     const cursor = document.createElement('div');
