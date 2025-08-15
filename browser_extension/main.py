@@ -11,6 +11,9 @@ from pyodide.ffi import create_proxy
 
 ws = WebSocket.new("ws://localhost:8000/ws")
 
+browser_height = window.innerHeight
+browser_width = window.innerWidth
+
 
 def create_fake_cursor():
     cursor = document.createElement("div")
@@ -166,6 +169,8 @@ scroll_value = 0
 
 def fetch_coordinates(data_x, data_y, fingers, data_type, click):
     global last_x, last_y, last_click, scroll_value, last_scroll_value
+    data_x = data_x * browser_width
+    data_y = data_y * browser_height
     try:
         console.log("New Data", data_x, data_y, fingers, data_type, click)
         if isinstance(data_x, (int, float)) and isinstance(data_y, (int, float)):

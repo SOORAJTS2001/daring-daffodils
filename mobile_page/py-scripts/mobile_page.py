@@ -75,8 +75,8 @@ async def touch_end(event):
     endX = touch.clientX
     endY = touch.clientY
 
-    deltaX = (endX - startX) * (1719 / browser_width)
-    deltaY = (endY - startY) * (865 / browser_height)
+    deltaX = (endX - startX) / browser_width
+    deltaY = (endY - startY) / browser_height
 
     click = False
     if isDragging:
