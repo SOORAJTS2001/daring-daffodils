@@ -34,7 +34,7 @@ fix = true
 
 [tool.ruff.lint]
 # Disable all linting rules for now.
-#select = ["ALL"]
+select = ["ALL"]
 # Ignore some of the most obnoxious linting errors.
 ignore = [
     # Missing docstrings.

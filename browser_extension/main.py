@@ -7,8 +7,6 @@ import traceback
 from js import MouseEvent, WebSocket, console, document, window
 from pyodide.ffi import create_proxy
 
-# FIREBASE_DB_URL = "https://fake-mouse-706a0-default-rtdb.firebaseio.com/coordinates.json"
-
 ws = WebSocket.new("ws://localhost:8000/ws")
 
 browser_height = window.innerHeight
@@ -20,14 +18,14 @@ def create_fake_cursor():
     cursor.id = "fake-cursor"
     style = cursor.style
     style.position = "fixed"
-    style.width = "10px"
-    style.height = "10px"
-    style.background = "red"
-    style.borderRadius = "50%"
+    style.width = "50px"
+    style.height = "50px"
     style.pointerEvents = "none"
     style.zIndex = 999999
     style.left = "0px"
     style.top = "0px"
+    style.backgroundSize = "cover"
+    style.backgroundImage = "url('http://127.0.0.1:8000/static/img.png')"
     document.body.appendChild(cursor)
     document.body.style.cursor = "none"
     return cursor
