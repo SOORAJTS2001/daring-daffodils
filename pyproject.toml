@@ -9,7 +9,7 @@ authors = [
 version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["fastapi[standard] (>=0.116.1,<0.117.0)"]
 
 [dependency-groups]
 # This `dev` group contains all the development requirements for our linting toolchain.
@@ -34,7 +34,7 @@ fix = true
 
 [tool.ruff.lint]
 # Disable all linting rules for now.
-select = ["ALL"]
+#select = ["ALL"]
 # Ignore some of the most obnoxious linting errors.
 ignore = [
     # Missing docstrings.
@@ -59,5 +59,5 @@ ignore = [
     "TD003",
     "FIX",
     # will remove at the end of project
-    "PGH004"
+#    "PGH004"
 ]
