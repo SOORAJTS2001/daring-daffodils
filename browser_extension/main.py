@@ -1,9 +1,7 @@
 # ruff : noqa
-
-
 import json
+import random
 import traceback
-
 from js import MouseEvent, WebSocket, console, document, window
 from pyodide.ffi import create_proxy
 
@@ -11,6 +9,13 @@ ws = WebSocket.new("ws://localhost:8000/ws")
 
 browser_height = window.innerHeight
 browser_width = window.innerWidth
+inactivity_timer = None
+wandering = False
+wandering_proxy = None
+
+WANDERING_STEP_X = 100
+WANDERING_STEP_Y = 100
+WANDERING_STEP_TIME = 500  # ms
 
 
 def create_fake_cursor():
@@ -29,6 +34,135 @@ def create_fake_cursor():
     document.body.appendChild(cursor)
     document.body.style.cursor = "none"
     return cursor
+
+
+def create_toast(message="Hello from PyScript 🎉"):
+    toast = document.createElement("div")
+    toast.innerText = message
+    toast.id = "toast"
+    style = toast.style
+    style.position = "fixed"
+    style.bottom = "30px"
+    style.left = "50%"
+    style.transform = "translateX(-50%)"
+    style.background = "#333"
+    style.color = "white"
+    style.padding = "14px 20px"
+    style.borderRadius = "10px"
+    style.fontSize = "16px"
+    style.zIndex = 999999
+    style.opacity = "0"
+    style.transition = "opacity 0.5s ease, bottom 0.5s ease"
+
+    document.body.appendChild(toast)  # ← this is missing
+    return toast
+
+
+def show_toast(msg="Hello from PyScript 🎉"):
+    toast = document.getElementById("toast")
+    if toast is None:  # if not created yet
+        toast = create_toast(msg)
+    else:
+        toast.innerText = msg
+
+    # Show
+    toast.style.opacity = "1"
+    toast.style.bottom = "50px"
+
+    # Hide after 3s
+    def hide_toast():
+        toast.style.opacity = "0"
+        toast.style.bottom = "30px"
+
+        def remove():
+            toast.remove()
+
+        rm_cb = create_proxy(remove)
+        window.setTimeout(rm_cb, 500)  # remove after fade out
+
+    cb = create_proxy(hide_toast)
+    window.setTimeout(cb, 3000)
+
+
+def random_mode(modes: list):
+    # choose a random number of items (between 1 and len(modes))
+    k = random.randint(1, len(modes))
+    # pick k items randomly without replacement
+    return random.sample(modes, k)
+
+
+def start_wandering():
+    global wandering, wandering_proxy
+    if wandering:
+        return  # already wandering
+    wandering = True
+    console.log("⚠️ No WebSocket messages — starting wandering mode")
+    modes = ["wandering", "rage", "shadow"]
+    mode = random_mode(modes)
+    if len(mode) == 1:
+        show_toast(f"You have activated {mode[0]} mode")
+    else:
+        show_toast(f"You have activated {(','.join(mode))} mode")
+
+    def wander_step(*args):
+        if not wandering:
+            return  # stop if deactivated
+
+        x = random.randint(0, browser_width - 50)  # subtract cursor size
+        y = random.randint(0, browser_height - 50)
+        dx = x
+        dy = y
+
+        if "shadow" in mode:
+            console.log("Shadow enabled")
+            fake_cursor.style.visibility = "visible" if fake_cursor.style.visibility == "hidden" else "hidden"
+
+        if "rage" in mode:
+            console.log("Rage enabled")
+            dx *= 2
+            dy *= 2
+        fake_cursor.style.left = f"{dx}px"
+        fake_cursor.style.top = f"{dy}px"
+        el = document.elementFromPoint(dx, dy)
+        if el:
+            tag = el.tagName.lower()
+            clickable = (
+                tag in ["button", "a", "input", "select"]
+                or el.onclick
+                or window.getComputedStyle(el).cursor == "pointer"
+            )
+            if clickable:
+                console.log("Clicking:", el)
+                trigger_click(el)
+
+        window.setTimeout(wandering_proxy, WANDERING_STEP_TIME)
+
+    # proxy wrapper for JS callbacks
+    wandering_proxy = create_proxy(wander_step)
+    wander_step()  # kick off wandering
+
+    # stop wandering after random duration
+    def stop_wandering(*args):
+        global wandering
+        wandering = False
+        fake_cursor.style.visibility = "visible"  # ensure visible at the end
+        console.log("✅ Wandering mode ended — control back to user")
+
+    duration = random.randint(10000, 60000)  # 10s–60s
+    window.setTimeout(create_proxy(stop_wandering), duration)
+    fake_cursor.style.visibility = "visible"
+
+
+def reset_inactivity_timer():
+    global inactivity_timer
+    if inactivity_timer is not None:
+        window.clearTimeout(inactivity_timer)
+
+    def on_timeout(*args):
+        start_wandering()
+
+    inactivity_timer = window.setTimeout(create_proxy(on_timeout), 10000)
+    console.log("finished_all")
 
 
 def send_text(text):
@@ -191,6 +325,9 @@ def fetch_coordinates(data_x, data_y, fingers, data_type, click):
         console.error(traceback.format_exc())
 
 
+reset_inactivity_timer()
+
+
 def onopen(event):
     console.log("✅ Connection opened from extension")
 
@@ -198,6 +335,7 @@ def onopen(event):
 def onmessage(event):
     data = json.loads(event.data)
     console.log("Received coordinates", data)
+    reset_inactivity_timer()
     fetch_coordinates(data["x"], data["y"], data["fingers"], data["type"], data["click"])
 
 
