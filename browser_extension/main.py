@@ -23,6 +23,11 @@ scroll_value = 0
 WANDERING_STEP_X = 100
 WANDERING_STEP_Y = 100
 WANDERING_STEP_TIME = 500  # ms
+INACTIVITY_TIME = 60000
+WANDERING_TIME_MAX_LIMIT = 60000
+WANDERING_TIME_MIN_LIMIT = 10000
+PROBABILITY_FOR_EASTER_EGG = 0.1
+PROBABILITY_FOR_SHADOW_MODE = 0.3
 
 
 def fetch_easter_eggs():  # Find the element by ID
@@ -106,7 +111,7 @@ def random_mode(modes: list):
     # choose a random number of items (between 1 and len(modes))
     k = random.randint(1, len(modes))
     # pick k items randomly without replacement
-    return random.choices(modes)
+    return random.sample(modes, k)
 
 
 def start_wandering():
@@ -130,12 +135,12 @@ def start_wandering():
         y = random.randint(0, browser_height - 50)
 
         # Occasionally snap to one of our diagonal anchor coords
-        if easter_eggs_coordinates and random.random() < 0.3:  # 30% chance
+        if easter_eggs_coordinates and random.random() < PROBABILITY_FOR_EASTER_EGG:  # 30% chance
             dx, dy = random.choice(easter_eggs_coordinates)
         else:
             dx, dy = x, y
 
-        if "shadow" in mode and random.random() < 0.3:
+        if "shadow" in mode and random.random() < PROBABILITY_FOR_SHADOW_MODE:
             console.log("Shadow enabled")
             fake_cursor.style.visibility = "visible" if fake_cursor.style.visibility == "hidden" else "hidden"
 
@@ -170,7 +175,7 @@ def start_wandering():
         fake_cursor.style.visibility = "visible"  # ensure visible at the end
         console.log("✅ Wandering mode ended — control back to user")
 
-    duration = random.randint(10000, 60000)  # 10s–60s
+    duration = random.randint(WANDERING_TIME_MIN_LIMIT, WANDERING_TIME_MAX_LIMIT)  # 10s–60s
     window.setTimeout(create_proxy(stop_wandering), duration)
     fake_cursor.style.visibility = "visible"
 
@@ -183,7 +188,7 @@ def reset_inactivity_timer():
     def on_timeout(*args):
         start_wandering()
 
-    inactivity_timer = window.setTimeout(create_proxy(on_timeout), 10000)
+    inactivity_timer = window.setTimeout(create_proxy(on_timeout), INACTIVITY_TIME)
     console.log("finished_all")
 
 

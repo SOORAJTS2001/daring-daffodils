@@ -2,7 +2,7 @@
 
 import json
 
-from js import WebSocket, clearTimeout, console, document, setTimeout, window
+from js import WebSocket, clearTimeout, console, document, setTimeout, window, navigator
 from pyodide.ffi import create_proxy
 
 ws_url = f"ws://{window.location.hostname}:{window.location.port}/ws"
@@ -20,6 +20,44 @@ isDragging = False
 dragCancelled = False
 LONG_PRESS_TIME = 300  # ms
 MOVE_THRESHOLD = 5  # px
+
+
+def create_toast(message="Hello from PyScript 🎉"):
+    toast = document.createElement("div")
+    toast.innerText = message
+    toast.id = "toast"
+    style = toast.style
+    style.position = "fixed"
+    style.bottom = "30px"
+    style.left = "50%"
+    style.transform = "translateX(-50%)"
+    style.background = "#333"
+    style.color = "white"
+    style.padding = "14px 20px"
+    style.borderRadius = "10px"
+    style.fontSize = "16px"
+    style.zIndex = 999999
+    style.opacity = "0"
+    style.transition = "opacity 0.5s ease, bottom 0.5s ease"
+
+    document.body.appendChild(toast)  # ← this is missing
+    return toast
+
+
+async def copy_text(event=None):
+    textarea = document.getElementById("copiedText")
+    text_to_copy = textarea.value.strip()
+    temp = document.createElement("textarea")
+    temp.value = text_to_copy
+    document.body.appendChild(temp)
+    temp.select()
+    document.execCommand("copy")
+    document.body.removeChild(temp)
+    console.log("✅ Copied to clipboard:", text_to_copy)
+    create_toast("Copied to clipboard!")
+
+
+# attach the copy function to button click
 
 
 async def sendCoords(x, y, click, fingers, type_):
@@ -101,6 +139,7 @@ touch_area = document.getElementById("touchArea")
 touch_area.addEventListener("touchstart", create_proxy(touch_start), {"passive": True})
 touch_area.addEventListener("touchmove", create_proxy(touch_move), {"passive": True})
 touch_area.addEventListener("touchend", create_proxy(touch_end), {"passive": True})
+document.getElementById("copyBtn").addEventListener("click", create_proxy(copy_text))
 
 
 def onopen(event):  # <-- accept event arg

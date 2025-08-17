@@ -24,7 +24,7 @@ pyscriptJs.onload = () => {
     });
 }
 
-fetch(chrome.runtime.getURL('easter_eggs.json'))
+fetch(chrome.runtime.getURL('static/easter_eggs.json'))
   .then(res => res.json())
   .then(videoList => {
     // Shuffle the list (Fisher–Yates)
@@ -39,7 +39,6 @@ fetch(chrome.runtime.getURL('easter_eggs.json'))
     videoList.forEach((video, i) => {
       const a = document.createElement('a');
       a.href = video.url;
-      a.textContent = video.title;
       a.target = "_blank";
       a.id = "pyscript-hidden-easter-eggs";
       a.style.position = "absolute";
