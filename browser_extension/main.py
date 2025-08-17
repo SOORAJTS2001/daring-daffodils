@@ -18,14 +18,14 @@ def create_fake_cursor():
     cursor.id = "fake-cursor"
     style = cursor.style
     style.position = "fixed"
-    style.width = "50px"
-    style.height = "50px"
+    style.width = "25px"
+    style.height = "25px"
     style.pointerEvents = "none"
     style.zIndex = 999999
     style.left = "0px"
     style.top = "0px"
     style.backgroundSize = "cover"
-    style.backgroundImage = "url('http://127.0.0.1:8000/static/img.png')"
+    style.backgroundImage = "url('http://127.0.0.1:8000/static/cursors/default.png')"
     document.body.appendChild(cursor)
     document.body.style.cursor = "none"
     return cursor
@@ -108,6 +108,44 @@ def trigger_click(el):
         el.dispatchEvent(event)
 
 
+def update_cursor(el, cursor):
+    cursor_style = window.getComputedStyle(el).cursor
+    final_path = "default"
+
+    if cursor_style in ["ne-resize", "nesw-resize", "sw-resize"]:
+        final_path = "ne-resize"
+    elif cursor_style in ["nw-resize", "nwse-resize", "se-resize"]:
+        final_path = "nw-resize"
+    elif cursor_style in ["n-resize", "ns-resize", "s-resize"]:
+        final_path = "n-resize"
+    elif cursor_style in ["w-resize", "ew-resize", "e-resize"]:
+        final_path = "w-resize"
+    elif cursor_style in ["all-scroll", "move"]:
+        final_path = "move"
+    elif cursor_style in ["not-allowed", "no-drop"]:
+        final_path = "not-allowed"
+    elif cursor_style in [
+        "alias",
+        "cell",
+        "col-resize",
+        "row-resize",
+        "copy",
+        "crosshair",
+        "grab",
+        "grabbing",
+        "help",
+        "pointer",
+        "progress",
+        "text",
+        "vertical-text",
+        "wait",
+        "zoom-in",
+        "zoom-out",
+    ]:
+        final_path = cursor_style
+    cursor.style.backgroundImage = f"url('http://127.0.0.1:8000/static/cursors/{final_path}.png')"
+
+
 def move_and_maybe_click(cursor, offset_x, offset_y, should_click):
     current_x = float(cursor.style.left.replace("px", "") or 0)
     current_y = float(cursor.style.top.replace("px", "") or 0)
@@ -126,6 +164,7 @@ def move_and_maybe_click(cursor, offset_x, offset_y, should_click):
     console.log(new_x, new_y)
 
     el = document.elementFromPoint(new_x, new_y)
+    update_cursor(el, cursor)
     if should_click and el:
         tag = el.tagName.lower()
         clickable = (
@@ -198,7 +237,10 @@ def onopen(event):
 def onmessage(event):
     data = json.loads(event.data)
     console.log("Received coordinates", data)
-    fetch_coordinates(data["x"], data["y"], data["fingers"], data["type"], data["click"])
+    if data["type"] == "motion":
+        console.log("Data sent: ", data["alpha"], data["beta"], data["gamma"])
+    else:
+        fetch_coordinates(data["x"], data["y"], data["fingers"], data["type"], data["click"])
 
 
 def onclose(event):
