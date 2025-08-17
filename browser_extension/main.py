@@ -237,10 +237,6 @@ def onopen(event):
 def onmessage(event):
     data = json.loads(event.data)
     console.log("Received coordinates", data)
-    if data["type"] == "motion":
-        console.log("Data sent: ", data["alpha"], data["beta"], data["gamma"])
-    else:
-        fetch_coordinates(data["x"], data["y"], data["fingers"], data["type"], data["click"])
 
 
 def onclose(event):
