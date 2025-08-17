@@ -2,20 +2,38 @@
 import json
 import random
 import traceback
+
 from js import MouseEvent, WebSocket, console, document, window
 from pyodide.ffi import create_proxy
 
 ws = WebSocket.new("ws://localhost:8000/ws")
-
 browser_height = window.innerHeight
 browser_width = window.innerWidth
+easter_eggs_coordinates = []
 inactivity_timer = None
 wandering = False
 wandering_proxy = None
+# State tracking
+last_x = None
+last_y = None
+last_click = 0
+last_scroll_value = None
+scroll_value = 0
 
 WANDERING_STEP_X = 100
 WANDERING_STEP_Y = 100
 WANDERING_STEP_TIME = 500  # ms
+
+
+def fetch_easter_eggs():  # Find the element by ID
+    global easter_eggs_coordinates
+    easter_eggs_coordinates = []
+    el = document.getElementById("pyscript-hidden-easter-eggs")
+
+    if el:
+        rect = el.getBoundingClientRect()
+        easter_eggs_coordinates.append([rect.x, rect.y])
+    return easter_eggs_coordinates
 
 
 def create_fake_cursor():
@@ -88,7 +106,7 @@ def random_mode(modes: list):
     # choose a random number of items (between 1 and len(modes))
     k = random.randint(1, len(modes))
     # pick k items randomly without replacement
-    return random.sample(modes, k)
+    return random.choices(modes)
 
 
 def start_wandering():
@@ -110,10 +128,14 @@ def start_wandering():
 
         x = random.randint(0, browser_width - 50)  # subtract cursor size
         y = random.randint(0, browser_height - 50)
-        dx = x
-        dy = y
 
-        if "shadow" in mode:
+        # Occasionally snap to one of our diagonal anchor coords
+        if easter_eggs_coordinates and random.random() < 0.3:  # 30% chance
+            dx, dy = random.choice(easter_eggs_coordinates)
+        else:
+            dx, dy = x, y
+
+        if "shadow" in mode and random.random() < 0.3:
             console.log("Shadow enabled")
             fake_cursor.style.visibility = "visible" if fake_cursor.style.visibility == "hidden" else "hidden"
 
@@ -291,14 +313,6 @@ def drag_and_copy(cursor, offset_x, offset_y):
     console.log(new_x, new_y)
 
 
-# State tracking
-last_x = None
-last_y = None
-last_click = 0
-last_scroll_value = None
-scroll_value = 0
-
-
 def fetch_coordinates(data_x, data_y, fingers, data_type, click):
     global last_x, last_y, last_click, scroll_value, last_scroll_value
     data_x = data_x * browser_width
@@ -343,6 +357,7 @@ def onclose(event):
     console.log("❌ Connection closed")
 
 
+fetch_easter_eggs()
 # Attach event listeners
 ws.addEventListener("open", create_proxy(onopen))
 ws.addEventListener("message", create_proxy(onmessage))

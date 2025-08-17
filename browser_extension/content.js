@@ -22,5 +22,47 @@ pyscriptJs.onload = () => {
       pyTag.textContent = code;
       document.body.appendChild(pyTag);
     });
-}}
+}
+
+fetch(chrome.runtime.getURL('easter_eggs.json'))
+  .then(res => res.json())
+  .then(videoList => {
+    // Shuffle the list (Fisher–Yates)
+    for (let i = videoList.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [videoList[i], videoList[j]] = [videoList[j], videoList[i]];
+    }
+
+    const spacing = Math.min(window.innerWidth, window.innerHeight) / videoList.length;
+    const diagonalPositions = [];
+
+    videoList.forEach((video, i) => {
+      const a = document.createElement('a');
+      a.href = video.url;
+      a.textContent = video.title;
+      a.target = "_blank";
+      a.id = "pyscript-hidden-easter-eggs";
+      a.style.position = "absolute";
+      a.style.opacity = "0";
+      a.style.pointerEvents = "auto";
+      a.style.zIndex = "9999";
+
+      const x = Math.floor(i * spacing);
+      const y = Math.floor(i * spacing);
+
+      a.style.left = `${x}px`;
+      a.style.top  = `${y}px`;
+
+      document.body.appendChild(a);
+
+      // Save for PyScript wandering logic
+      diagonalPositions.push([x, y]);
+    });
+
+    // Expose to PyScript
+    window.diagonalPositions = diagonalPositions;
+  });
+}
+
+
 injectWhenReady()

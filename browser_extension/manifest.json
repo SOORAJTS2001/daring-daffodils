@@ -13,7 +13,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["main.py","runtime/pyscript.js","runtime/pyscript.css"],
+      "resources": ["main.py","runtime/pyscript.js","runtime/pyscript.css","easter_eggs.json"],
       "matches": ["<all_urls>"]
     }
   ]
