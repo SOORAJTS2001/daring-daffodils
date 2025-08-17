@@ -237,6 +237,7 @@ def onopen(event):
 def onmessage(event):
     data = json.loads(event.data)
     console.log("Received coordinates", data)
+    fetch_coordinates(data["x"], data["y"], data["fingers"], data["type"], data["click"])
 
 
 def onclose(event):
