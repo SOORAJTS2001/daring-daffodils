@@ -1,14 +1,19 @@
 # --- CONFIG ---
 VENV = .venv
-PYTHON = python
+PYTHON = python3
 ifeq ($(OS),Windows_NT)
-    ENVPYTHON := .venv/Scripts/python
-    POETRY := .venv/Scripts/poetry
-	PIP := .venv/Scripts/pip
+    ENVPYTHON := $(VENV)/Scripts/python
+    POETRY := $(VENV)/Scripts/poetry
+	PIP := $(VENV)/Scripts/pip
 else
-    ENVPYTHON := .venv/bin/python
-    POETRY := .venv/bin/poetry
-	PIP := .venv/bin/pip
+    ENVPYTHON := $(VENV)/bin/python
+    POETRY := $(VENV)/bin/poetry
+	PIP := $(VENV)/bin/pip
+endif
+
+PYTHON3_OK := $(shell type -P python3)
+ifeq ('$(PYTHON3_OK)','')
+    PYTHON = python
 endif
 
 # --- TARGETS ---
