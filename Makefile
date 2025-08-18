@@ -1,15 +1,20 @@
 # --- CONFIG ---
-PYTHON := $(shell command -v python3 || command -v python)
-
-# Detect OS and choose correct venv activate path
+VENV = .venv
+PYTHON = python3
 ifeq ($(OS),Windows_NT)
-    ACTIVATE = .venv/Scripts/activate
+    ENVPYTHON := $(VENV)/Scripts/python
+    POETRY := $(VENV)/Scripts/poetry
+	PIP := $(VENV)/Scripts/pip
 else
-    ACTIVATE = .venv/bin/activate
+    ENVPYTHON := $(VENV)/bin/python
+    POETRY := $(VENV)/bin/poetry
+	PIP := $(VENV)/bin/pip
 endif
 
-VENV = .venv
-POETRY = $(VENV)/bin/poetry
+PYTHON3_OK := $(shell type -P python3)
+ifeq ('$(PYTHON3_OK)','')
+    PYTHON = python
+endif
 
 # --- TARGETS ---
 
@@ -18,25 +23,22 @@ POETRY = $(VENV)/bin/poetry
 all: run
 
 # Ensure venv exists
-$(ACTIVATE):
-	@echo "👉 Creating virtual environment with $(PYTHON)..."
+$(VENV):
+	@echo "👉 Creating virtual environment..."
 	@$(PYTHON) -m venv $(VENV)
 
 # Install Poetry inside venv if missing
-$(POETRY): $(ACTIVATE)
+$(POETRY): $(VENV)
 	@echo "👉 Ensuring Poetry is installed..."
-	@. $(ACTIVATE) && \
-		(if ! command -v poetry >/dev/null 2>&1; then \
-			curl -sSL https://install.python-poetry.org | $(PYTHON) -; \
-		fi)
+	@$(PIP) install poetry
 
 setup: $(POETRY)
 	@echo "👉 Installing dependencies..."
-	@. $(ACTIVATE) && poetry install --no-root
+	@$(POETRY) install --no-root
 
 run: setup
 	@echo "👉 Running uvicorn server..."
-	@. $(ACTIVATE) && python app.py
+	@$(ENVPYTHON) app.py
 
 clean:
 	@echo "🧹 Cleaning up..."

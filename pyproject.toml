@@ -1,10 +1,18 @@
 [project]
 # This section contains metadata about your project.
 # Don't forget to change the name, description, and authors to match your project!
-name = "daring-daffodils"
-description = "Our Code Jam 12 Project"
+name = "Misclick"
+description = '''Why settle for a boring, predictable mouse when you can have pure chaos?
+Misclick is a “wireless mouse” that isn’t really wireless… or a mouse… or particularly useful. Instead of moving your actual cursor, it randomly wanders across the screen, misbehaves on touch, and occasionally copies text just to remind you who’s in charge.
+In short: It’s not the right tool for the job — and that’s the whole point.'''
 authors = [
-    { name = "Your Name" }
+    { name = "Sooraj T S"},
+    { name = "Daksh Gakhar"},
+    { name = "SaketKunjathur"},
+    { name = "Vibhakar Solanki"},
+    { name = "Oni Musha"},
+    { name = "Astar-777"}
+
 ]
 version = "0.1.0"
 readme = "README.md"

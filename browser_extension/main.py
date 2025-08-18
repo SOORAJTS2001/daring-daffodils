@@ -39,10 +39,10 @@ NEXT_SCROLL_VALUE = 0
 WANDERING_STEP_X = 100
 WANDERING_STEP_Y = 100
 WANDERING_STEP_TIME = 500  # ms between cursor hops
-INACTIVITY_TIME = 60000  # 1 minute idle → wander mode kicks in
+INACTIVITY_TIME = 30000  # 1 minute idle → wander mode kicks in
 WANDERING_TIME_MAX_LIMIT = 60000  # wander lasts max 60s
 WANDERING_TIME_MIN_LIMIT = 10000  # wander lasts min 10s
-PROBABILITY_FOR_EASTER_EGG = 0.1  # 10% chance to snap to Easter egg location
+PROBABILITY_FOR_EASTER_EGG = 0.3  # 10% chance to snap to Easter egg location
 PROBABILITY_FOR_SHADOW_MODE = 0.3  # 30% chance of toggling cursor visibility
 
 
