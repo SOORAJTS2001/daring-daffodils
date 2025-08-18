@@ -60,7 +60,7 @@ async def lifespan(app: FastAPI):
                 f"[bold cyan]1.[/bold cyan] Connect to the same Wi-Fi network",
                 f"[bold cyan]2.[/bold cyan] Scan the QR code",
                 f"[bold cyan]  [/bold cyan] Or [yellow]{mobile_page_url}[/yellow]",
-                f"[bold cyan]3.[/bold cyan] Go to the scroll area and enjoy!",
+                f"[bold cyan]3.[/bold cyan] That's it, Now do your Misclick!",
             ]
         ),
         title="Steps",
