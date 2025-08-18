@@ -227,10 +227,16 @@ reset_inactivity_timer()
 
 # WebSocket event handlers
 def onopen(event):  # noqa: ARG001
+    """
+    When connection is established
+    """
     console.log("✅ Connection opened from extension")
 
 
 def onmessage(event):  # noqa: ARG001
+    """
+    When message is received
+    """
     data = json.loads(event.data)
     console.log("Received coordinates", data)
     reset_inactivity_timer()  # reset idle timer on activity
@@ -238,6 +244,9 @@ def onmessage(event):  # noqa: ARG001
 
 
 def onclose(event):  # noqa: ARG001
+    """
+    When connection is closed
+    """
     console.log("❌ Connection closed")
 
 
