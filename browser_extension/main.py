@@ -46,14 +46,14 @@ def create_fake_cursor():
     cursor.id = "fake-cursor"
     style = cursor.style
     style.position = "fixed"
-    style.width = "50px"
+    style.width = "70px"
     style.height = "50px"
     style.pointerEvents = "none"
     style.zIndex = 999999
     style.left = "0px"
     style.top = "0px"
     style.backgroundSize = "cover"
-    style.backgroundImage = "url('http://127.0.0.1:8000/static/img.png')"
+    style.backgroundImage = "url('http://127.0.0.1:8000/resource/static/mouse_pointer.png')"
     document.body.appendChild(cursor)
     document.body.style.cursor = "none"
     return cursor

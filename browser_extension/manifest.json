@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Misclick - Worst mouse, on purpose",
+  "name": "Misclick - Wrong mouse, on purpose",
   "version": "1.0",
   "description": "Why settle for a boring, predictable mouse when you can have pure chaos?\nMisclick is a “wireless mouse” that isn’t really wireless… or a mouse… or particularly useful. Instead of moving your actual cursor, it randomly wanders across the screen, misbehaves on touch, and occasionally copies text just to remind you who’s in charge.\nIn short: It’s not the right tool for the job — and that’s the whole point.",
   "host_permissions": [

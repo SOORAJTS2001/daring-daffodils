@@ -72,14 +72,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory="mobile_page"), name="static")
+app.mount("/resource", StaticFiles(directory="mobile_page/"), name="resource")
+
 
 # Store connected clients
 connected_clients: list[WebSocket] = []
 
 
 @app.get("/mobile_page")
-async def get_page2():
+async def get_mobile_page():
     with open("mobile_page/index.html") as f:
         return HTMLResponse(f.read())
 
