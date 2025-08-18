@@ -1,20 +1,52 @@
 {
   "manifest_version": 3,
-  "name": "PyScript Auto Injector",
+  "name": "Misclick - Wrong mouse, on purpose",
   "version": "1.0",
-  "description": "Automatically inject PyScript headers and main.py on every page.",
-  "host_permissions": ["<all_urls>"],
+  "description": "Why settle for a boring, predictable mouse when you can have pure chaos?\nMisclick is a “wireless mouse” that isn’t really wireless… or a mouse… or particularly useful. Instead of moving your actual cursor, it randomly wanders across the screen, misbehaves on touch, and occasionally copies text just to remind you who’s in charge.\nIn short: It’s not the right tool for the job — and that’s the whole point.",
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["main.py","runtime/pyscript.js","runtime/pyscript.css"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "main.py",
+        "runtime/pyscript.js",
+        "runtime/pyscript.css",
+        "static/easter_eggs.json",
+        "static/icon16.png",
+        "static/icon32.png",
+        "static/icon48.png",
+        "static/icon128.png"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
-  ]
+  ],
+  "icons": {
+    "16": "static/icon16.png",
+    "32": "static/icon32.png",
+    "48": "static/icon48.png",
+    "128": "static/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "static/icon16.png",
+      "32": "static/icon32.png",
+      "48": "static/icon48.png",
+      "128": "static/icon128.png"
+    }
+  }
 }

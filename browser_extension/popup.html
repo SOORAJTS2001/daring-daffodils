@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PyScript Hello World</title>
-    <py-config>
-      [[runtimes]]
-      src = "runtime/pyodide.js"
-      name = "pyodide-0.21.3"
-      lang = "python"
-    </py-config>
-    <link rel="icon" type="icons/png" href="/icon-128.png" />
-    <link rel="stylesheet" href="runtime/pyscript.css" />
-    <link rel="stylesheet" href="./popup.css" />
-    <script defer src="runtime/pyscript.js"></script>
-    <script src="content.js"></script>
-    <script src="popup.js"></script>
-  </head>
-  <body>
-  <py-script src="main.py"></py-script>
-<!--    <button py-click="write_to_popup()" id="manual">Say Hello</button>-->
-    <br><div id="hello"></div></br>
-  </body>
-
-<!-- Deliberately breaking indendation for easy Copy/Paste of Python code -->
-<!--<py-script>-->
-<!--def write_to_popup():-->
-<!--  manual_div = Element("hello")-->
-<!--  manual_div.element.innerHTML = "<p><b>Hello World, this is Python!</b></p>"-->
-<!--</py-script>-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Misclick</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      text-align: center;
+      width: 300px;   /* increase popup width */
+      height: 250px;  /* increase popup height */
+      box-sizing: border-box;
+    }
+    img {
+      width: 70%;
+      display: block;
+      margin: 20px auto;
+    }
+    .content {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <img src="static/misclick_with_mouse_transparent.png" alt="Misclick" />
+  <div class="content">
+    <b>Hi there 👋</b><br>
+    Thank you for using our extension, few things to remember, to make this extension work you need to run our websocket server first
+    which could be found <a href="https://github.com/SOORAJTS2001/daring-daffodils" target="_blank">here</a>.
+    <br><br>
+    That's it! Do your MisClick!
+  </div>
+</body>
 </html>

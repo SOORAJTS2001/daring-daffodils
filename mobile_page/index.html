@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Touch, Drag, Scroll Detection</title>
+    <title>Misclick - Wrong Tool, for a reason</title>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,7 +24,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: #f8f9fa;
+            /* Background image */
+            background-image:  url("resource/static/brick_wall.png");
+            background-size: cover; /* Fill the whole screen */
+            background-position: center; /* Keep it centered */
+            background-repeat: no-repeat; /* Prevent tiling */
         }
 
         #touchArea {
@@ -31,7 +37,13 @@
             overflow-y: auto;
             padding: 10px;
             box-sizing: border-box;
-            background: linear-gradient(#ffcccc, #ccffcc);
+
+            /* Background image */
+            background-image: url("resource/static/toucharea_background.png");
+            background-size: cover; /* Make the image fill the area */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Avoid tiling */
+
             touch-action: none;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE/Edge */
@@ -44,12 +56,18 @@
         .content {
             height: 50vh; /* fake content */
         }
+
+        img {
+            width: 50%;
+            display: block;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
 
 <div class="container text-center">
-    <h1 class="mb-4">Touch, Drag, Scroll Detection</h1>
+    <img src="resource/static/misclick_icon.png" alt="Misclick"/>
 
     <!-- Touch Area -->
     <div id="touchArea" class="mb-4 shadow-sm border">
@@ -58,13 +76,20 @@
 
     <!-- Textarea to paste copied text -->
     <div class="mb-3">
-        <label for="copiedText" class="form-label fw-bold">Copied Text</label>
-        <textarea id="copiedText" class="form-control" rows="5" placeholder="Your copied text will appear here..." readonly></textarea>
+        <label for="copiedText" class="form-label fw-bold">
+        </label>
+        <textarea id="copiedText"
+                  rows="1"
+                  placeholder="Your copied text will appear here..."
+                  readonly
+                  style="background: transparent; border: none; outline: none; resize: none; width: 100%;
+           color: white; font-size: 2rem; font-family: 'Permanent Marker', cursive;">
+  </textarea>
     </div>
 </div>
 
 <!-- PyScript -->
-<py-script src="static/py-scripts/mobile_page.py"></py-script>
+<py-script src="resource/mobile_page.py"></py-script>
 
 <!-- Bootstrap JS (optional for components) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

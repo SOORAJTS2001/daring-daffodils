@@ -2,20 +2,43 @@
 import json
 import random
 import traceback
+
 from js import MouseEvent, WebSocket, console, document, window
 from pyodide.ffi import create_proxy
 
 ws = WebSocket.new("ws://localhost:8000/ws")
-
 browser_height = window.innerHeight
 browser_width = window.innerWidth
+easter_eggs_coordinates = []
 inactivity_timer = None
 wandering = False
 wandering_proxy = None
+# State tracking
+last_x = None
+last_y = None
+last_click = 0
+last_scroll_value = None
+scroll_value = 0
 
 WANDERING_STEP_X = 100
 WANDERING_STEP_Y = 100
 WANDERING_STEP_TIME = 500  # ms
+INACTIVITY_TIME = 60000
+WANDERING_TIME_MAX_LIMIT = 60000
+WANDERING_TIME_MIN_LIMIT = 10000
+PROBABILITY_FOR_EASTER_EGG = 0.1
+PROBABILITY_FOR_SHADOW_MODE = 0.3
+
+
+def fetch_easter_eggs():  # Find the element by ID
+    global easter_eggs_coordinates
+    easter_eggs_coordinates = []
+    el = document.getElementById("pyscript-hidden-easter-eggs")
+
+    if el:
+        rect = el.getBoundingClientRect()
+        easter_eggs_coordinates.append([rect.x, rect.y])
+    return easter_eggs_coordinates
 
 
 def create_fake_cursor():
@@ -23,14 +46,14 @@ def create_fake_cursor():
     cursor.id = "fake-cursor"
     style = cursor.style
     style.position = "fixed"
-    style.width = "50px"
+    style.width = "70px"
     style.height = "50px"
     style.pointerEvents = "none"
     style.zIndex = 999999
     style.left = "0px"
     style.top = "0px"
     style.backgroundSize = "cover"
-    style.backgroundImage = "url('http://127.0.0.1:8000/static/img.png')"
+    style.backgroundImage = "url('http://127.0.0.1:8000/resource/static/mouse_pointer.png')"
     document.body.appendChild(cursor)
     document.body.style.cursor = "none"
     return cursor
@@ -110,10 +133,14 @@ def start_wandering():
 
         x = random.randint(0, browser_width - 50)  # subtract cursor size
         y = random.randint(0, browser_height - 50)
-        dx = x
-        dy = y
 
-        if "shadow" in mode:
+        # Occasionally snap to one of our diagonal anchor coords
+        if easter_eggs_coordinates and random.random() < PROBABILITY_FOR_EASTER_EGG:  # 30% chance
+            dx, dy = random.choice(easter_eggs_coordinates)
+        else:
+            dx, dy = x, y
+
+        if "shadow" in mode and random.random() < PROBABILITY_FOR_SHADOW_MODE:
             console.log("Shadow enabled")
             fake_cursor.style.visibility = "visible" if fake_cursor.style.visibility == "hidden" else "hidden"
 
@@ -148,7 +175,7 @@ def start_wandering():
         fake_cursor.style.visibility = "visible"  # ensure visible at the end
         console.log("✅ Wandering mode ended — control back to user")
 
-    duration = random.randint(10000, 60000)  # 10s–60s
+    duration = random.randint(WANDERING_TIME_MIN_LIMIT, WANDERING_TIME_MAX_LIMIT)  # 10s–60s
     window.setTimeout(create_proxy(stop_wandering), duration)
     fake_cursor.style.visibility = "visible"
 
@@ -161,7 +188,7 @@ def reset_inactivity_timer():
     def on_timeout(*args):
         start_wandering()
 
-    inactivity_timer = window.setTimeout(create_proxy(on_timeout), 10000)
+    inactivity_timer = window.setTimeout(create_proxy(on_timeout), INACTIVITY_TIME)
     console.log("finished_all")
 
 
@@ -291,14 +318,6 @@ def drag_and_copy(cursor, offset_x, offset_y):
     console.log(new_x, new_y)
 
 
-# State tracking
-last_x = None
-last_y = None
-last_click = 0
-last_scroll_value = None
-scroll_value = 0
-
-
 def fetch_coordinates(data_x, data_y, fingers, data_type, click):
     global last_x, last_y, last_click, scroll_value, last_scroll_value
     data_x = data_x * browser_width
@@ -343,6 +362,7 @@ def onclose(event):
     console.log("❌ Connection closed")
 
 
+fetch_easter_eggs()
 # Attach event listeners
 ws.addEventListener("open", create_proxy(onopen))
 ws.addEventListener("message", create_proxy(onmessage))
