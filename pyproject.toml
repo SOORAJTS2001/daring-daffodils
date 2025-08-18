@@ -37,15 +37,12 @@ fix = true
 
 [tool.ruff.lint]
 # Disable all linting rules for now.
-#select = ["ALL"]
+select = [
+    "E", # all syntax and formatting errors
+    "F", # Pyflakes checks (undefined names, unused imports)
+]
 # Ignore some of the most obnoxious linting errors.
 ignore = [
-    # Missing docstrings.
-    "D100",
-    "D104",
-    "D105",
-    "D106",
-    "D107",
     # Docstring whitespace.
     "D203",
     "D213",
@@ -61,6 +58,4 @@ ignore = [
     "TD002",
     "TD003",
     "FIX",
-    # will remove at the end of project
-    "PGH004"
 ]

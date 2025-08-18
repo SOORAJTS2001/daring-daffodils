@@ -27,7 +27,8 @@
         "static/icon16.png",
         "static/icon32.png",
         "static/icon48.png",
-        "static/icon128.png"
+        "static/icon128.png",
+        "utils/*"
       ],
       "matches": [
         "<all_urls>"
