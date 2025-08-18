@@ -1,54 +1,54 @@
-# setup.ps1
-# Failsafe script for Windows to create venv, install Poetry, install deps, and run app.py
+# setup_and_run.ps1
 
-$ErrorActionPreference = "Stop"
+# --- Step 0: Set paths ---
+$venvPath = ".\.venv"
+$activateScript = "$venvPath\Scripts\Activate.ps1"
 
-# --- CONFIG ---
-$VENV_DIR = ".venv"
-$PYTHON = (Get-Command python3 -ErrorAction SilentlyContinue).Source
-if (-not $PYTHON) {
-    $PYTHON = (Get-Command python -ErrorAction SilentlyContinue).Source
+# --- Step 1: Check for Python ---
+$python = Get-Command python -ErrorAction SilentlyContinue
+if (-not $python) {
+    $python = Get-Command python3 -ErrorAction SilentlyContinue
+    if (-not $python) {
+        Write-Host "❌ Python not found. Please install Python 3.10+ from https://www.python.org/downloads/windows/"
+        exit 1
+    }
 }
-if (-not $PYTHON) {
-    Write-Host "❌ Python 3 not found. Please install Python 3.8+ or higher." -ForegroundColor Red
+
+Write-Host "✅ Python found at $($python.Path)"
+
+# --- Step 2: Create virtual environment ---
+if (-not (Test-Path $venvPath)) {
+    Write-Host "👉 Creating virtual environment..."
+    & $python.Path -m venv $venvPath
+} else {
+    Write-Host "✅ Virtual environment already exists"
+}
+
+# --- Step 3: Activate virtual environment ---
+if (-not (Test-Path $activateScript)) {
+    Write-Host "❌ Activation script not found!"
     exit 1
 }
 
-# --- FUNCTIONS ---
-function Log($msg) { Write-Host "👉 $msg" -ForegroundColor Cyan }
-function Fail($msg) { Write-Host "❌ $msg" -ForegroundColor Red; exit 1 }
-
-# --- CREATE VENV IF NEEDED ---
-if (-not (Test-Path $VENV_DIR)) {
-    Log "Creating virtual environment in $VENV_DIR..."
-    & $PYTHON -m venv $VENV_DIR
+# Function to run commands inside venv
+function Run-InVenv($cmd) {
+    & $activateScript
+    Invoke-Expression $cmd
 }
 
-# --- ACTIVATE VENV ---
-$activate = Join-Path $VENV_DIR "Scripts\Activate.ps1"
-if (-not (Test-Path $activate)) {
-    Fail "Virtual environment activation script not found at $activate"
-}
-. $activate
-Log "Virtual environment activated."
-
-# --- INSTALL POETRY IF MISSING ---
+# --- Step 4: Ensure Poetry is installed ---
 $poetry = Get-Command poetry -ErrorAction SilentlyContinue
 if (-not $poetry) {
-    Log "Installing Poetry..."
-    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | & $PYTHON -
-    $env:Path += ";$env:USERPROFILE\.local\bin"
-    $poetry = Get-Command poetry -ErrorAction SilentlyContinue
-    if (-not $poetry) {
-        Fail "Poetry installation failed. Add $env:USERPROFILE\.local\bin to PATH manually."
-    }
+    Write-Host "👉 Installing Poetry..."
+    Invoke-Expression "& $python.Path -c `"$(Invoke-WebRequest -UseBasicParsing https://install.python-poetry.org).Content`""
+} else {
+    Write-Host "✅ Poetry already installed"
 }
-Log "Poetry available at $($poetry.Source)"
 
-# --- INSTALL DEPENDENCIES ---
-Log "Installing dependencies..."
-poetry install --no-root
+# --- Step 5: Install dependencies ---
+Write-Host "👉 Installing dependencies..."
+Run-InVenv "poetry install"
 
-# --- RUN APP ---
-Log "Running app.py..."
-python app.py
+# --- Step 6: Run main.py ---
+Write-Host "👉 Running main.py..."
+Run-InVenv "python app.py"
