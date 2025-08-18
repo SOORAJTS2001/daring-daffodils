@@ -1,7 +1,9 @@
 # --- CONFIG ---
+SHELL := powershell.exe
+.SHELLFLAGS := -Command
 VENV = .venv
-PYTHON = python3
-POETRY = $(VENV)/bin/poetry
+PYTHON = python
+POETRY = $(VENV)/Scripts/poetry
 
 # --- TARGETS ---
 
@@ -10,25 +12,22 @@ POETRY = $(VENV)/bin/poetry
 all: run
 
 # Ensure venv exists
-$(VENV)/bin/activate:
+$(VENV)/Scripts/activate:
 	@echo "👉 Creating virtual environment..."
 	@$(PYTHON) -m venv $(VENV)
 
 # Install Poetry inside venv if missing
-$(POETRY): $(VENV)/bin/activate
+$(POETRY): $(VENV)/Scripts/activate
 	@echo "👉 Ensuring Poetry is installed..."
-	@. $(VENV)/bin/activate && \
-		(if ! command -v poetry >/dev/null 2>&1; then \
-			curl -sSL https://install.python-poetry.org | $(PYTHON) -; \
-		fi)
+	@. $(VENV)/Scripts/pip install poetry
 
 setup: $(POETRY)
 	@echo "👉 Installing dependencies..."
-	@. $(VENV)/bin/activate && poetry install --no-root
+	@. $(POETRY) install --no-root
 
 run: setup
 	@echo "👉 Running uvicorn server..."
-	@. $(VENV)/bin/activate && python app.py
+	@$(VENV)/Scripts/python app.py
 
 clean:
 	@echo "🧹 Cleaning up..."
