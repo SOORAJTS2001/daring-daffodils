@@ -118,9 +118,14 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 
 ## How to use
 
-- Mobile page
-    <p align="center">
-  <img src="documentation/mobile_page.png" alt="Mouse Pointer"/>
+### Mobile page
+<p align="center">
+  <img src="documentation/mobile_page.png" alt="Mobile Page" width="300" height="400"/>
 </p>
-- Browser extension
-    ![Activating browser extension](https://raw.githubusercontent.com/SOORAJTS2001/daring-daffodils/refs/heads/feat/add-documentation/documentation/activating_extension.gif)
+
+### Browser extension
+#### Activation
+<p align="center">
+  <img src="https://raw.githubusercontent.com/SOORAJTS2001/daring-daffodils/refs/heads/feat/add-documentation/documentation/activating_extension.gif"
+       alt="Activating Browser Extension" width="600"/>
+</p>
