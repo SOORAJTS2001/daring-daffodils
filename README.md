@@ -27,7 +27,8 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 ## 📑 Table of Contents
 
 - [What can it do](#-what-can-it-do)
-- [Installation](#-installation)
+- [How to install](#-installation)
+- [How to use](#-how-to-use)
 - [Working](#-working)
 - [Limitations](#-limitations)
 - [Contributors--Contribution](#-contributors--contribution)
@@ -82,13 +83,13 @@ That is Misclick - A way to control your mouse, **but in opposite way**
        ![Enable Developer Mode](./documentation/load_unpacked_button.png)
 3. Starting up server — **Make sure your PC/Laptop and phone are connected via the same WiFi**
 
-    1. Using [Makefile](https://en.wikipedia.org/wiki/Make_(software))
+    1. Option 1: Using [Makefile](https://en.wikipedia.org/wiki/Make_(software))
         1. Just run the command:
            ```bash
            make
            ```  
            inside the root directory, where the `Makefile` is located.
-    2. Manual setup
+    2. Option 2: Manual setup
         1. Create your environment:
            ```bash
            python3 -m venv .env
@@ -109,7 +110,17 @@ That is Misclick - A way to control your mouse, **but in opposite way**
            ```bash
            python3 app.py
            ```
-    3. After the server starts, it will show you a QR code. [Open that with your phone](https://www.android.com/articles/how-do-you-scan-qr-codes-on-android/)
+    3. After the server starts, it will show you a QR
+       code. [Open that with your phone](https://www.android.com/articles/how-do-you-scan-qr-codes-on-android/)
          <p align="center">
           <img src="documentation/server_qr_code.png" alt="Mouse Pointer"/>
          </p>
+
+## How to use
+
+- Mobile page
+    <p align="center">
+  <img src="documentation/mobile_page.png" alt="Mouse Pointer"/>
+</p>
+- Browser extension
+    ![Activating browser extension](https://raw.githubusercontent.com/SOORAJTS2001/daring-daffodils/refs/heads/feat/add-documentation/documentation/activating_extension.gif)
