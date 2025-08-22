@@ -31,7 +31,6 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 - [How to use](#how-to-use)
 - [How it is working](#how-it-is-working)
 - [Limitations](#limitations)
-- [Contributors--Contribution](#-contributors--contribution)
 
 ---
 
@@ -163,7 +162,15 @@ That is Misclick - A way to control your mouse, **but in opposite way**
     </td>
   </tr>
 </table>
+<p align="center">
+  <img src="documentation/utils_not_found_error.png" alt="Mouse Pointer"/>
+</p>
 
+**⚠️ If you see an error like above**
+or the mouse is not showing up:  
+
+- Hard refresh the page  
+- Restart the server
 
 ## How it is working
 
@@ -233,3 +240,6 @@ It mainly involves two key files:***
 - **`pyscript.js`** – JavaScript glue for PyScript. It integrates Pyodide with HTML elements like `<py-script>` and `<py-repl>`, enabling inline Python execution inside web pages or extensions.  
 
 ***Since extensions cannot load executable code directly from the internet (for security reasons), we had to package these files locally instead of relying on CDNs.***
+
+## Limitations
+Sometimes the extension could not be used inside sites and restricts script injection, it will throw an error
