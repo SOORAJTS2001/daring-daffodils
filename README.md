@@ -232,14 +232,15 @@ or the mouse is not showing up:
     - Collects and returns the text content (whitespace-trimmed).
     - Visually highlights the region by overlaying a semi-transparent blue box.
     - The highlight box automatically disappears after 2 seconds.
-
+    -
+**Although, all our core functionality and logic are in python**<br><br>
 ***You may have noticed that a significant part of our project is shown as JavaScript. This is because the Python runtime in the browser extension relies on JavaScript to bootstrap and interact with WebAssembly.  
 It mainly involves two key files:***
 
 - **`pyodide.asm.js`** – Emscripten-generated “glue code” that initializes the WebAssembly (`.wasm`) binary and connects it to the browser’s JavaScript environment.  
 - **`pyscript.js`** – JavaScript glue for PyScript. It integrates Pyodide with HTML elements like `<py-script>` and `<py-repl>`, enabling inline Python execution inside web pages or extensions.  
 
-***Since extensions cannot load executable code directly from the internet (for security reasons), we had to package these files locally instead of relying on CDNs.***
+***Since extensions cannot load executable code directly from the internet (for security reasons), we had to package these files locally instead of relying on CDNs.***<br>
 
 ## Limitations
 Sometimes the extension could not be used inside sites and restricts script injection, it will throw an error
