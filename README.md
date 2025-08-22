@@ -26,16 +26,16 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 
 ## 📑 Table of Contents
 
-- [What can it do](#-what-can-it-do)
-- [How to install](#-installation)
-- [How to use](#-how-to-use)
-- [Working](#-working)
-- [Limitations](#-limitations)
+- [What can it do](#what-can-it-do)
+- [How to install](#how-to-install)
+- [How to use](#how-to-use)
+- [How it is working](#how-it-is-working)
+- [Limitations](#limitations)
 - [Contributors--Contribution](#-contributors--contribution)
 
 ---
 
-## What can it do ?
+## What can it do
 
 - Oh, just casually pair your phone with your browser over WebSocket — because Bluetooth and USB are *too mainstream*.
 - Control your browser’s mouse with your phone, but in reverse. Yes, swipe left to go right. Because logic is overrated.
@@ -59,7 +59,7 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 
 ---
 
-## ⚙️ Installation
+## How to install
 
 ### Prerequisites
 
@@ -85,9 +85,15 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 
     1. Option 1: Using [Makefile](https://en.wikipedia.org/wiki/Make_(software))
         1. Just run the command:
-           ```bash
-           make
-           ```  
+            -  Linux/MacOS
+               ```bash
+               make
+               ```  
+            - Windows
+                - By default, Windows does not include GNU Make. Install via [this](https://www.msys2.org/)
+                ```bash
+               make
+               ```  
            inside the root directory, where the `Makefile` is located.
     2. Option 2: Manual setup
         1. Create your environment:
@@ -95,9 +101,14 @@ That is Misclick - A way to control your mouse, **but in opposite way**
            python3 -m venv .env
            ```  
         2. Activate it:
+           - Linux/MacOS
            ```bash
            source .env/bin/activate
            ```  
+           - Windows
+           ```bash
+           .env\Scripts\Activate.ps1
+           ```
         3. Install Poetry:
            ```bash
            pip install poetry
@@ -118,14 +129,85 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 
 ## How to use
 
-### Mobile page
-<p align="center">
-  <img src="documentation/mobile_page.png" alt="Mobile Page" width="300" height="400"/>
-</p>
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="documentation/mobile_page.png" alt="Mobile Page" width="300"/><br/>
+      <b>Mobile page</b>
+    </td>
+    <td align="center">
+      <img src="https://raw.githubusercontent.com/SOORAJTS2001/daring-daffodils/refs/heads/feat/add-documentation/documentation/activating_extension.gif"
+           alt="Activating Browser Extension" width="600"/><br/>
+      <b>Browser extension</b>
+    </td>
+  </tr>
+</table>
 
-### Browser extension
-#### Activation
+## How it is working
+
+### Architecture Diagram
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/SOORAJTS2001/daring-daffodils/refs/heads/feat/add-documentation/documentation/activating_extension.gif"
-       alt="Activating Browser Extension" width="600"/>
-</p>
+          <img src="documentation/architecture.png" alt="Mouse Pointer"/>
+         </p>
+
+### Tech used
+
+- Pyscript/pyodide for rendering UI
+- `fastapi` for serving static pages and as a websocket server
+- `qrcode` library for generating url for mobile page
+- `pyodide` wrapper js to setup runtime for python in browser extension
+
+### Working
+
+<b>The backend is bind to the port `8000`</b>
+
+#### Mobile page
+
+- Once server is up, the mobile page url is shown in the terminal
+- On opening the mobile page, the websocket connection between the server and the frontend is established via pyscript
+- Inside the `mobile_page.py` it calls the Javascript native API's using pyodide/pyscript and manipulates the DOM
+- We have eventListeners in js, which is used for listen and trigger to user events like drag, scroll and click
+- We are having a proxy between the js and python for object and function transfer as
+  explained [here](https://jeff.glass/post/pyscript-why-create-proxy/)
+- For every js `touchstart` event we would record it, until it ends with `touchend` and send the <b>change ratio</b>
+  rather than coordinates via
+  websocket to the browser
+
+#### Browser extension - This is where magic happens
+
+- By default, Chrome extensions cannot load remote code (JS, WASM, CSS) from CDNs because of Content Security Policy (
+  CSP).
+- Hence we had to package the runtime scripts for python inside the browser, which is
+  this [runtime](https://github.com/SOORAJTS2001/daring-daffodils/tree/main/browser_extension/runtime)
+- Instead of making the entire extension in python which is very very hard (due to support),we are just injecting our
+  python files and
+  it's dependency into every website
+- Upon activating (by default it has access to all web pages) it connects to our python web socket server, and
+  shows <img src="mobile_page/static/mouse_pointer.png" alt="Mouse Pointer" height="20px"/> which turns-out to be your
+  new cursor!
+- When a `delta` is received from the mobile page, it is rescaled to match the browser’s dimensions and projected onto the browser. This causes the cursor to move according to the user’s interaction.
+- It would get the type of event's user has sent like scroll, drag, selection and corresponding actions are performed
+
+##### Clicks
+
+- if a click is fired from the user side, then a `MouseEvent` is fired on browser
+##### Drag
+- Tap for 300ms and scroll is considered as the Drag
+##### Selection
+- It could send user selected text to their connected phone
+- Defines a rectangle using the given screen coordinates (x1, y1) and (x2, y2).
+- Walks through all text nodes in the document body.
+- For each text node, checks whether any part of its bounding client rect intersects with the defined rectangle.
+- If overlapping text is found:
+    - Collects and returns the text content (whitespace-trimmed).
+    - Visually highlights the region by overlaying a semi-transparent blue box.
+    - The highlight box automatically disappears after 2 seconds.
+
+***You may have noticed that a significant part of our project is shown as JavaScript. This is because the Python runtime in the browser extension relies on JavaScript to bootstrap and interact with WebAssembly.  
+It mainly involves two key files:***
+
+- **`pyodide.asm.js`** – Emscripten-generated “glue code” that initializes the WebAssembly (`.wasm`) binary and connects it to the browser’s JavaScript environment.  
+- **`pyscript.js`** – JavaScript glue for PyScript. It integrates Pyodide with HTML elements like `<py-script>` and `<py-repl>`, enabling inline Python execution inside web pages or extensions.  
+
+***Since extensions cannot load executable code directly from the internet (for security reasons), we had to package these files locally instead of relying on CDNs.***
