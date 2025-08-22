@@ -136,12 +136,34 @@ That is Misclick - A way to control your mouse, **but in opposite way**
       <b>Mobile page</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/SOORAJTS2001/daring-daffodils/refs/heads/feat/add-documentation/documentation/activating_extension.gif"
+      <img src="documentation/activating_extension.gif"
            alt="Activating Browser Extension" width="600"/><br/>
       <b>Browser extension</b>
     </td>
   </tr>
+  <tr>
+    <td align="center">
+      <img src="documentation/misclick_intro.gif" alt="Browser extension - Basic movement" width="300"/><br/>
+      <b>Browser extension - Basic movement</b>
+    </td>
+    <td align="center">
+      <img src="documentation/misclick_mode.gif" alt="Browser extension - Mode Activation" width="300"/><br/>
+      <b>Browser extension - Mode Activation</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="documentation/browser_selection.png" alt="Browser extension - Selection" width="300"/><br/>
+      <b>Browser extension - Selection</b>
+    </td>
+    <td align="center">
+      <img src="documentation/mobile_send.png"
+           alt="Received by phone" width="300" height="500"/><br/>
+      <b>Text Received by phone</b>
+    </td>
+  </tr>
 </table>
+
 
 ## How it is working
 
