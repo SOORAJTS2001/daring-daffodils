@@ -240,7 +240,7 @@ It mainly involves two key files:***
 - **`pyodide.asm.js`** – Emscripten-generated “glue code” that initializes the WebAssembly (`.wasm`) binary and connects it to the browser’s JavaScript environment.  
 - **`pyscript.js`** – JavaScript glue for PyScript. It integrates Pyodide with HTML elements like `<py-script>` and `<py-repl>`, enabling inline Python execution inside web pages or extensions.  
 
-***Since extensions cannot load executable code directly from the internet (for security reasons), we had to package these files locally instead of relying on CDNs.***<br><br>
+***Since extensions cannot load executable code directly from the internet (for security reasons), we had to package these files locally instead of relying on CDNs.***<br>
 
 ## Limitations
 Sometimes the extension could not be used inside sites and restricts script injection, it will throw an error
