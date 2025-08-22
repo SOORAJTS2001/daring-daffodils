@@ -234,11 +234,13 @@ or the mouse is not showing up:
 - When a `delta` is received from the mobile page, it is rescaled to match the browser’s dimensions and projected onto the browser. This causes the cursor to move according to the user’s interaction.
 - It would get the type of event's user has sent like scroll, drag, selection and corresponding actions are performed
 
+PS: All `delta` should be reversed inside the browser to do the opposite interaction on browser
 ##### Clicks
-
 - if a click is fired from the user side, then a `MouseEvent` is fired on browser
+#### Scroll
+- `touchstart` event detection along with finger counting
 ##### Drag
-- Tap for 300ms and scroll is considered as the Drag
+- Tap for 300ms and scroll, is considered as the Drag
 ##### Selection
 - It could send user selected text to their connected phone
 - Defines a rectangle using the given screen coordinates (x1, y1) and (x2, y2).
@@ -248,7 +250,7 @@ or the mouse is not showing up:
     - Collects and returns the text content (whitespace-trimmed).
     - Visually highlights the region by overlaying a semi-transparent blue box.
     - The highlight box automatically disappears after 2 seconds.
-    -
+
 **Although, all our core functionality and logic are in python**<br><br>
 ***You may have noticed that a significant part of our project is shown as JavaScript. This is because the Python runtime in the browser extension relies on JavaScript to bootstrap and interact with WebAssembly.  
 It mainly involves two key files:***
