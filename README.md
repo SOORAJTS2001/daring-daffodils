@@ -27,6 +27,7 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 ## 📑 Table of Contents
 
 - [What can it do](#what-can-it-do)
+- [Why is it the wrong tool](#why-is-it-the-wrong-tool-for-the-job)
 - [How to install](#how-to-install)
 - [How to use](#how-to-use)
 - [How it is working](#how-it-is-working)
@@ -57,6 +58,21 @@ That is Misclick - A way to control your mouse, **but in opposite way**
 - No accounts, no personal info — because who would *willingly* sign up for this anyway?
 
 ---
+## Why is it the wrong tool for the job
+
+You already have a perfectly good **mouse**.  
+So why on earth would you want to turn your **mobile into one**?
+
+- You don’t *need* your phone as a mouse if you already own one.  
+- It doesn’t just move the cursor… it moves it the **opposite way** you tell it to.  
+- Scrolling? Clicks? Forget precision — this thing thrives on chaos.
+- And to make sure you never get comfortable, we’ve added 3 **Chaotic Modes** that guarantee *you’re not in charge*.
+
+
+---
+
+> **In short:** It’s unnecessary, uncooperative, and completely backwards.  
+> Which is exactly why it deserves to exist.
 
 ## How to install
 
