@@ -250,6 +250,7 @@ PS: All `delta` should be reversed inside the browser to do the opposite interac
     - Collects and returns the text content (whitespace-trimmed).
     - Visually highlights the region by overlaying a semi-transparent blue box.
     - The highlight box automatically disappears after 2 seconds.
+
 **Although, all our core functionality and logic are in python**<br><br>
 ***You may have noticed that a significant part of our project is shown as JavaScript. This is because the Python runtime in the browser extension relies on JavaScript to bootstrap and interact with WebAssembly.  
 It mainly involves two key files:***
